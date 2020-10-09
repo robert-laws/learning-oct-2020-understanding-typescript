@@ -1,0 +1,23 @@
+{
+  "name": "learning-oct-2020-understanding-typescript",
+  "version": "1.0.0",
+  "description": "Code along to udemy course - understanding typescript",
+  "main": "app.js",
+  "scripts": {
+    "start": "lite-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/robert-laws/learning-oct-2020-understanding-typescript.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/robert-laws/learning-oct-2020-understanding-typescript/issues"
+  },
+  "homepage": "https://github.com/robert-laws/learning-oct-2020-understanding-typescript#readme",
+  "devDependencies": {
+    "lite-server": "^2.5.4"
+  }
+}
