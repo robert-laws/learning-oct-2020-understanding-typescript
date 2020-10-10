@@ -4,7 +4,7 @@
   "description": "Code along to udemy course - understanding typescript",
   "main": "app.js",
   "scripts": {
-    "start": "lite-server"
+    "start": "lite-server --baseDir='public'"
   },
   "repository": {
     "type": "git",
