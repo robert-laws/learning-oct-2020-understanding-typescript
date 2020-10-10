@@ -1,24 +1,21 @@
-function add(n1: number, n2: number) {
-  return n1 + n2;
+// unknown type
+let userInput: unknown;
+let userName: string;
+
+userInput = 5;
+userInput = 'hello';
+
+if (typeof userInput === 'string') {
+  userName = userInput;
 }
 
-function printResult(num: number): void {
-  console.log(`Result ${num}`);
+// never type
+function generateError(message: string, code: number): never {
+  throw {
+    message,
+    errorCode: code,
+  };
 }
 
-function addAndHandle(n1: number, n2: number, cb: (num: number) => void) {
-  const result = n1 + n2;
-  cb(result);
-}
-
-printResult(add(5, 2));
-
-// function type describe a function including parameters and return type
-let combineValues: (a: number, b: number) => number;
-
-combineValues = add;
-console.log(combineValues(5, 9));
-
-addAndHandle(10, 90, (result) => {
-  console.log(result);
-});
+const result = generateError('An error occurred', 400);
+console.log(result);
