@@ -1,23 +1,54 @@
-// types number, string, boolean
-function add(n1: number, n2: number, showResult: boolean) {
-  if (showResult) {
-    console.log(n1 + n2);
-  } else {
-    return n1 + n2;
-  }
+// const person: {
+//   name: string;
+//   age: number;
+// } = {
+//   name: 'bob',
+//   age: 34,
+// };
+
+// objects and arrays
+
+// const person: {
+//   name: string;
+//   age: number;
+//   hobbies: string[];
+//   role: [number, string];
+// } = {
+//   name: 'bob',
+//   age: 34,
+//   hobbies: ['walking', 'reading'],
+//   role: [6, 'item'],
+// };
+
+enum Role {
+  ADMIN,
+  READ_ONLY,
+  AUTHOR,
 }
 
-const subtract = (num1: number, num2: number): number => {
-  return num1 - num2;
+const person = {
+  name: 'bob',
+  age: 34,
+  hobbies: ['walking', 'reading'],
+  role: Role.ADMIN,
 };
 
-let myValue: number;
-let number1 = 4;
-const number2 = 5;
-const printResult = true;
+let activities: string[];
+activities = ['boating', 'walking'];
 
-number1 = 8;
+for (const hobby of person.hobbies) {
+  console.log(hobby.toLowerCase());
+}
 
-const result = add(number1, number2, printResult);
+console.log(person.role);
 
-console.log(subtract(34, 21));
+// Tuple
+// [1, 2] - fixed length and type array
+// ex. role: [number, string];
+
+// Enum
+// enum { new, old } - automatically enumerated global constant identifiers
+// ex enum Role { ADMIN, USER } - assigns labels to numbers
+
+// Any
+// allows use of any type - avoid if possible
