@@ -1,54 +1,39 @@
-// const person: {
-//   name: string;
-//   age: number;
-// } = {
-//   name: 'bob',
-//   age: 34,
-// };
+type Combinable = number | string;
+type ConversionDescriptor = 'as-number' | 'as-text';
 
-// objects and arrays
-
-// const person: {
-//   name: string;
-//   age: number;
-//   hobbies: string[];
-//   role: [number, string];
-// } = {
-//   name: 'bob',
-//   age: 34,
-//   hobbies: ['walking', 'reading'],
-//   role: [6, 'item'],
-// };
-
-enum Role {
-  ADMIN,
-  READ_ONLY,
-  AUTHOR,
+function combine(
+  input1: Combinable,
+  input2: Combinable,
+  resultConversion: ConversionDescriptor
+) {
+  let result;
+  if (
+    (typeof input1 === 'number' && typeof input2 === 'number') ||
+    resultConversion === 'as-number'
+  ) {
+    result = +input1 + +input2;
+  } else {
+    result = input1.toString() + input2.toString();
+  }
+  // if (resultConversion === 'as-number') {
+  //   return +result;
+  // } else {
+  //   return result.toString();
+  // }
+  return result;
 }
 
-const person = {
-  name: 'bob',
-  age: 34,
-  hobbies: ['walking', 'reading'],
-  role: Role.ADMIN,
-};
+console.log(combine(6, 5, 'as-number'));
+console.log(combine('40', '33', 'as-number'));
+console.log(combine('Bob', 'Cobb', 'as-text'));
 
-let activities: string[];
-activities = ['boating', 'walking'];
+// union types - accept more than one type of value
+// let val: number | string;
 
-for (const hobby of person.hobbies) {
-  console.log(hobby.toLowerCase());
-}
+// literal types - explicitly declare the value should be held in a variable
+// const val = 5.25;
+// val: 'admin' | 'user'
 
-console.log(person.role);
-
-// Tuple
-// [1, 2] - fixed length and type array
-// ex. role: [number, string];
-
-// Enum
-// enum { new, old } - automatically enumerated global constant identifiers
-// ex enum Role { ADMIN, USER } - assigns labels to numbers
-
-// Any
-// allows use of any type - avoid if possible
+// type alias
+// use keyword type and name of custom type
+// type Combinable = string | number;
