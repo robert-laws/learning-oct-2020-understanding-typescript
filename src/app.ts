@@ -80,3 +80,19 @@ class HRBuilding extends Building {
 
 const HR = HRBuilding.getInstance();
 console.log(HR);
+
+class Team {
+  private _teamName: string;
+
+  constructor() {
+    this._teamName = '';
+  }
+
+  get teamName(): string {
+    return this._teamName;
+  }
+
+  set teamName(value: string) {
+    this._teamName = value;
+  }
+}
