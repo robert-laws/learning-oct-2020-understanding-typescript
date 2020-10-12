@@ -1,46 +1,54 @@
-interface AddFn {
-  (a: number, b: number): number;
+// type Admin = {
+//   name: string;
+//   roles: string[];
+// };
+
+// type Employee = {
+//   name: string;
+//   startDate: Date;
+// };
+
+// type ElevatedEmployee = Admin & Employee;
+
+interface Admin {
+  name: string;
+  roles: string[];
 }
 
-let add: AddFn;
+interface Employee {
+  name: string;
+  startDate: Date;
+}
 
-add = (n1: number, n2: number) => {
-  return n1 + n2;
+interface ElevatedEmployee extends Employee, Admin {}
+
+const e1: ElevatedEmployee = {
+  name: 'Bob',
+  roles: ['create-server'],
+  startDate: new Date(),
 };
 
-interface Named {
-  _name: string;
-  outputName?: string;
+type Combinable = string | number;
+type Numeric = number | boolean;
+
+type Universal = Combinable & Numeric;
+
+function add(a: Combinable, b: Combinable) {
+  // type guard
+  if (typeof a === 'string' || typeof b === 'string') {
+    return a.toString() + b.toString();
+  }
+  return a + b;
 }
 
-interface Greetable extends Named {
-  greet(phrase: string): void;
+type UnknownEmployee = Employee | Admin;
+
+function printEmployeeInformation(emp: UnknownEmployee) {
+  // type guard for property in type
+  if ('roles' in emp) {
+    console.log('roles: ' + emp.roles);
+  }
+  if ('startDate' in emp) {
+    console.log('start date: ' + emp.startDate);
+  }
 }
-
-class Person implements Greetable {
-  _name: string;
-  age = 34;
-
-  constructor(n: string) {
-    this._name = n;
-  }
-
-  public get name(): string {
-    return this._name;
-  }
-
-  public set name(value: string) {
-    this._name = `${value} ... `;
-  }
-
-  greet = (phrase: string) => {
-    console.log(`${this.name} says, ${phrase}`);
-  };
-}
-
-// let userOne: Greetable;
-
-let userOne = new Person('Bob');
-userOne.name = 'Kalvin';
-
-userOne.greet('hello there...');
