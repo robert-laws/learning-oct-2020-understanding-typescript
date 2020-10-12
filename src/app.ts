@@ -1,6 +1,19 @@
-interface Greetable {
-  _name: string;
+interface AddFn {
+  (a: number, b: number): number;
+}
 
+let add: AddFn;
+
+add = (n1: number, n2: number) => {
+  return n1 + n2;
+};
+
+interface Named {
+  _name: string;
+  outputName?: string;
+}
+
+interface Greetable extends Named {
   greet(phrase: string): void;
 }
 
