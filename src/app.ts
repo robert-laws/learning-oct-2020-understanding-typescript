@@ -1,104 +1,92 @@
-// generics - basics
-// const names: Array<string> = [];
-// names[0].split(' ');
-
-// const promise: Promise<string> = new Promise((resolve, reject) => {
-//   setTimeout(() => {
-//     resolve('This is done');
-//   }, 1000);
-// });
-
-// promise.then((data) => {
-//   data.split(' ');
-// });
-
-// generic example with constraints
-function merge<T extends object, U extends object>(objA: T, objB: U) {
-  return Object.assign(objA, objB);
+// decorators
+function Logger(logString: string) {
+  return function (constructor: Function) {
+    console.log(logString);
+    console.log(constructor);
+  };
 }
 
-console.log(merge({ name: 'Bob' }, { age: 5 }));
-
-const mergedObj = merge({ name: 'Bob', hobbies: ['boating'] }, { age: 5 });
-console.log(mergedObj.age);
-
-// generic example with constraints
-interface Lengthy {
-  length: number;
+function WithTemplate(template: string, hookId: string) {
+  return function <T extends { new (...args: any[]): { name: string } }>(
+    originalConstructor: T
+  ) {
+    return class extends originalConstructor {
+      constructor(..._: any[]) {
+        super();
+        console.log('Rendering Template...');
+        const hookElem = document.getElementById(hookId);
+        if (hookElem) {
+          hookElem.innerHTML = template;
+          hookElem.querySelector('h2')!.textContent = this.name;
+        }
+      }
+    };
+  };
 }
 
-function countAndDescribe<T extends Lengthy>(element: T): [T, string] {
-  let description = 'Got no value';
-  if (element.length === 1) {
-    description = 'Got 1 element.';
-  } else if (element.length > 1) {
-    description = 'Got ' + element.length + ' elements.';
-  }
-  return [element, description];
-}
+@Logger('LOGGING - PERSON')
+@WithTemplate('<h2>My Person Object</h2>', 'app')
+class Person {
+  name = 'Kalvin';
 
-console.log(countAndDescribe('hello'));
-
-// generic example using keyof constraint
-function extractAndConvert<T extends object, U extends keyof T>(
-  obj: T,
-  key: U
-) {
-  return obj[key];
-}
-
-console.log(extractAndConvert({ name: 'Bob' }, 'name'));
-
-// generic class
-class DataStorage<T extends string | number | boolean> {
-  private _data: T[] = [];
-
-  addItem(item: T) {
-    this._data.push(item);
-  }
-
-  removeItem(item: T) {
-    this._data.splice(this._data.indexOf(item), 1);
-  }
-
-  getItems() {
-    return [...this._data];
+  constructor() {
+    console.log('Creating person object...');
   }
 }
 
-const textStorage = new DataStorage<string>();
-textStorage.addItem('hal');
-textStorage.addItem('bob');
-textStorage.addItem('kal');
-textStorage.removeItem('hal');
-console.log(textStorage.getItems());
+const per = new Person();
 
-const numberStorage = new DataStorage<number>();
+console.log(per.name);
 
-// const objectStorage = new DataStorage<object>();
-// objectStorage.addItem({ name: 'Bob' });
-// objectStorage.addItem({ name: 'Hal' });
+// --------
 
-// objectStorage.removeItem({ name: 'Bob' });
-// console.log(objectStorage.getItems());
+function Log(target: any, propertyName: string | Symbol) {
+  console.log('Property decorator');
+  console.log(target, propertyName);
+}
 
-interface CourseGoal {
+function LogTwo(target: any, name: string, descriptor: PropertyDescriptor) {
+  console.log('Accessor decorator');
+  console.log(target);
+  console.log(name);
+  console.log(descriptor);
+}
+
+function LogThree(target: any, name: string, descriptor: PropertyDescriptor) {
+  console.log('Method decorator');
+  console.log(target);
+  console.log(name);
+  console.log(descriptor);
+}
+
+function LogFour(target: any, name: string | Symbol, position: number) {
+  console.log('Parameter decorator');
+  console.log(target);
+  console.log(name);
+  console.log(position);
+}
+
+class Product {
+  @Log
   title: string;
-  description: string;
-  completeUntil: Date;
-}
+  private _price: number;
 
-function createCourseGoal(
-  title: string,
-  description: string,
-  date: Date
-): CourseGoal {
-  let courseGoal: Partial<CourseGoal> = {};
-  courseGoal.title = title;
-  courseGoal.description = description;
-  courseGoal.completeUntil = date;
-  return courseGoal as CourseGoal;
-}
+  @LogTwo
+  set price(val: number) {
+    if (val > 0) {
+      this._price = val;
+    } else {
+      throw new Error('Invalid price - should be positive');
+    }
+  }
 
-const names: Readonly<string[]> = ['Bob', 'Hal', 'Kal'];
-// names.push('Jim'); // error
+  constructor(t: string, p: number) {
+    this.title = t;
+    this._price = p;
+  }
+
+  @LogThree
+  getPriceWithTax(@LogFour tax: number) {
+    return this._price * tax;
+  }
+}
