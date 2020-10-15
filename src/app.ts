@@ -1,108 +1,14 @@
-import { Draggable, DragTarget } from './models/drag-drop.js';
+import * as DragDrop from './models/drag-drop.js';
 import { Project, ProjectStatus } from './models/project.js';
 import { AutoBind } from './decorators/autobind.js';
-
-// project state management
-type Listener<T> = (items: T[]) => void;
-
-class State<T> {
-  protected listeners: Listener<T>[] = [];
-
-  addListener(listenerFn: Listener<T>) {
-    this.listeners.push(listenerFn);
-  }
-}
-
-class ProjectState extends State<Project> {
-  private projects: Project[] = [];
-  private static instance: ProjectState;
-
-  private constructor() {
-    super();
-  }
-
-  static getInstance() {
-    if (this.instance) {
-      return this.instance;
-    }
-    this.instance = new ProjectState();
-    return this.instance;
-  }
-
-  addProject(title: string, description: string, numOfPeople: number) {
-    const newProject = new Project(
-      Math.random().toString(),
-      title,
-      description,
-      numOfPeople,
-      ProjectStatus.Active
-    );
-    this.projects.push(newProject);
-    this.updateListeners();
-  }
-
-  moveProject(projectId: string, newStatus: ProjectStatus) {
-    const project = this.projects.find((p) => p.id === projectId);
-    if (project && project.status !== newStatus) {
-      project.status = newStatus;
-      this.updateListeners();
-    }
-  }
-
-  private updateListeners() {
-    for (const listenerFn of this.listeners) {
-      listenerFn(this.projects.slice());
-    }
-  }
-}
-
-const projectState = ProjectState.getInstance();
-
-// Component class
-abstract class Component<T extends HTMLElement, U extends HTMLElement> {
-  templateElement: HTMLTemplateElement;
-  hostElement: T;
-  element: U;
-
-  constructor(
-    templateId: string,
-    hostElementId: string,
-    insertAtStart: boolean,
-    newElementId?: string
-  ) {
-    this.templateElement = document.getElementById(
-      templateId
-    )! as HTMLTemplateElement;
-    this.hostElement = <T>document.getElementById(hostElementId)!;
-
-    const importedNode = document.importNode(
-      this.templateElement.content,
-      true
-    );
-
-    this.element = <U>importedNode.firstElementChild;
-    if (newElementId) {
-      this.element.id = newElementId;
-    }
-
-    this.attach(insertAtStart);
-  }
-
-  private attach(insertAtBeginning: boolean) {
-    this.hostElement.insertAdjacentElement(
-      insertAtBeginning ? 'afterbegin' : 'beforeend',
-      this.element
-    );
-  }
-
-  abstract configure(): void;
-  abstract renderContent(): void;
-}
+import { Validatable, validate as ValidFn } from './util/validation.js';
+import Component from './components/base.js';
+import { projectState } from './state/Project.js';
 
 // ProjectItem Class
 class ProjectItem
   extends Component<HTMLUListElement, HTMLLIElement>
-  implements Draggable {
+  implements DragDrop.Draggable {
   private project: Project;
 
   get persons() {
@@ -144,7 +50,7 @@ class ProjectItem
 // ProjectList Class
 class ProjectList
   extends Component<HTMLDivElement, HTMLElement>
-  implements DragTarget {
+  implements DragDrop.DragTarget {
   assignedProjects: Project[];
 
   constructor(private type: 'active' | 'finished') {
@@ -214,54 +120,6 @@ class ProjectList
   }
 }
 
-// Validation
-interface Validatable {
-  value: string | number;
-  required?: boolean;
-  minLength?: number;
-  maxLength?: number;
-  min?: number;
-  max?: number;
-}
-
-function validate(validatableInput: Validatable) {
-  let isValid = true;
-  if (validatableInput.required) {
-    isValid = isValid && validatableInput.value.toString().trim().length !== 0;
-  }
-
-  if (
-    validatableInput.minLength != null &&
-    typeof validatableInput.value === 'string'
-  ) {
-    isValid =
-      isValid && validatableInput.value.length > validatableInput.minLength;
-  }
-
-  if (
-    validatableInput.maxLength != null &&
-    typeof validatableInput.value === 'string'
-  ) {
-    isValid =
-      isValid && validatableInput.value.length < validatableInput.maxLength;
-  }
-
-  if (
-    validatableInput.min != null &&
-    typeof validatableInput.value === 'number'
-  ) {
-    isValid = isValid && validatableInput.value > validatableInput.min;
-  }
-
-  if (
-    validatableInput.max != null &&
-    typeof validatableInput.value === 'number'
-  ) {
-    isValid = isValid && validatableInput.value < validatableInput.max;
-  }
-  return isValid;
-}
-
 // ProjectInput Class
 class ProjectInput extends Component<HTMLDialogElement, HTMLFormElement> {
   titleInputElement: HTMLInputElement;
@@ -312,9 +170,9 @@ class ProjectInput extends Component<HTMLDialogElement, HTMLFormElement> {
     };
 
     if (
-      !validate(titleValidatable) ||
-      !validate(descriptionValidatable) ||
-      !validate(peopleValidatable)
+      !ValidFn(titleValidatable) ||
+      !ValidFn(descriptionValidatable) ||
+      !ValidFn(peopleValidatable)
     ) {
       alert('Invalid input!');
       return;
